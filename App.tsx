@@ -6,6 +6,7 @@ import HomeScreen from "./components/HomeScreen";
 import ChatScreen from "./components/ChatScreen";
 import ProfileScreen from "./components/ProfileScreen";
 import SettingsScreen from "./components/SettingsScreen";
+import WelcomeScreen from "./components/WelcomeScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -36,7 +37,7 @@ export default function App() {
       >
         <Tab.Screen
           name="Home"
-          component={HomeScreen}
+          component={WelcomeScreen}
         />
         <Tab.Screen
           name="Chat"
