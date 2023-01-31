@@ -1,18 +1,21 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { StatusBar } from 'react-native'
 
 import HomeScreen from "./components/HomeScreen";
 import ChatScreen from "./components/ChatScreen";
 import ProfileScreen from "./components/ProfileScreen";
 import SettingsScreen from "./components/SettingsScreen";
 import WelcomeScreen from "./components/WelcomeScreen";
+import MyColors from "./themes/myTheme";
 
 const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
+      <StatusBar hidden={true}/>
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
@@ -30,9 +33,10 @@ export default function App() {
             }
             return <Ionicons name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: "#a0c1d1",
-          tabBarInactiveTintColor: "gray",
+          tabBarActiveTintColor: MyColors.primary,
+          tabBarInactiveTintColor: MyColors.text,
           headerShown: false,
+          tabBarStyle: { backgroundColor: MyColors.background }
         })}
       >
         <Tab.Screen
