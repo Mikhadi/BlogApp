@@ -6,6 +6,7 @@ const MyColors = {
       googleButton: "rgba(67, 133, 244, 1)",
       gradientStart: "rgba(36, 37, 71, 0.4471)",
       gradientEnd: "rgba(36, 37, 71, 1)",
+      gray: "rgba(200, 200, 200, 1)",
   };
 
 export default MyColors
