@@ -1,22 +1,19 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
-import { StatusBar } from "react-native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useState } from "react";
+import { FC } from "react";
 
-import WelcomeScreen from "./components/WelcomeScreen";
-import RegisterScreen from "./components/RegisterScreen";
-import MyColors from "./themes/myTheme";
+import AuthStack from './components/AuthComponent';
+import TabsStack from "./components/TabsComponent";
 
-const Stack = createNativeStackNavigator();
-
-export default function App() {
+const App: FC<{ route: any; navigation: any }> = ({
+  route,
+  navigation,
+}) => {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ title: "Apply to all", headerShown: false, animation: 'none'}}>
-        <Stack.Screen name="Login" component={WelcomeScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen}/>
-      </Stack.Navigator>
+      <TabsStack route={route} navigation={navigation}/>
     </NavigationContainer>
-  );
+    );
 }
+
+export default App

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -28,7 +29,7 @@ const WelcomeScreen: FC<{ route: any; navigation: any }> = ({
   const [eyeIcon, setEyeIcon]: any = useState("eye-outline");
 
   const loginPressed = () => {
-    alert("Login Pressed");
+    Alert.alert("Login Pressed");
   };
 
   const hidePass = () => {
