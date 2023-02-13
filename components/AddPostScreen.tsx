@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { View, Text, StyleSheet, StatusBar } from "react-native";
+import MyColors from "../themes/myTheme";
 
 const AddPostScreen: FC = () => {
     return (
@@ -11,11 +12,11 @@ const AddPostScreen: FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-      marginTop: StatusBar.currentHeight,
       flex: 1,
       justifyContent: "center",
       alignContent: "center",
       alignItems: "center",
+      backgroundColor: MyColors.background
     },
 });
 

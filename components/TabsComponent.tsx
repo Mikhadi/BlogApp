@@ -34,7 +34,7 @@ const TabsStack: FC<{ route: any; navigation: any }> = ({
                 ? "chatbox-ellipses"
                 : "chatbox-ellipses-outline";
             } else if (route.name === "Post") {
-              iconName = focused ? "add-circle" : "add-circle-outline";
+              iconName = "add-circle";
               iconSize = 45;
             } else if (route.name === "Profile") {
               iconName = focused ? "person" : "person-outline";
