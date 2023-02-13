@@ -4,10 +4,8 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import MyColors from '../themes/myTheme';
 
 export const ListItem: FC<{ name: String; id: String; image: any, avatar: any, text: String }> = ({
-  name,
   id,
   image,
-  avatar,
   text
 }) => {
   return (
