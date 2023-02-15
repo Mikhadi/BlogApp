@@ -9,10 +9,15 @@ import {
 } from "react-native";
 import MyColors from "../themes/myTheme";
 
-const SettingsScreen: FC = () => {
+const SettingsScreen: FC<{ route: any; navigation: any}> = ({
+  route,
+  navigation,
+}) => {
+
   return (
     <View style={styles.container}>
-        <TouchableOpacity style={{flexDirection:'row', alignItems: 'center', marginTop: 20, marginLeft: 10, borderBottomWidth: 2, borderBottomColor: 'white', marginRight: 10}}>
+        <TouchableOpacity
+          style={{flexDirection:'row', alignItems: 'center', marginTop: 20, marginLeft: 10, borderBottomWidth: 2, borderBottomColor: 'white', marginRight: 10}}>
           <Ionicons name={"log-out"} color={"white"} size={40} />
           <Text style={{color: 'white', fontSize: 20}}>Logout</Text>
         </TouchableOpacity>

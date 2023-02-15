@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  StatusBar,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,7 +20,7 @@ const googlePressed = () => {
   alert("Google presed");
 };
 
-const WelcomeScreen: FC<{ route: any; navigation: any }> = ({
+const WelcomeScreen: FC<{ route: any; navigation: any}> = ({
   route,
   navigation,
 }) => {
@@ -29,8 +30,8 @@ const WelcomeScreen: FC<{ route: any; navigation: any }> = ({
   const [eyeIcon, setEyeIcon]: any = useState("eye-outline");
 
   const loginPressed = () => {
-    Alert.alert("Login Pressed");
-  };
+    Alert.alert("Login pressed")
+  }
 
   const hidePass = () => {
     setHiddenPass(!hiddenPass);

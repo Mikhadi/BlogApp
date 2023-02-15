@@ -7,11 +7,12 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
+  StatusBar,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import MyColors from "../themes/myTheme";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import * as ImagePicker from "expo-image-picker";
 
 const RegisterScreen: FC<{ route: any; navigation: any }> = ({
   route,
@@ -19,62 +20,99 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
 }) => {
   const [description, setDescription] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [photoUri, setPhotoUri] = useState("");
+
+  const openCamera = async () => {
+    setModalVisible(false);
+    try {
+      const res = await ImagePicker.launchCameraAsync();
+      if (!res.canceled && res.assets.length > 0) {
+        const uri = res.assets[0].uri;
+        setPhotoUri(uri);
+      }
+    } catch (err) {
+      console.log("Open camera failed");
+    }
+  };
+
+  const openGallery = async () => {
+    setModalVisible(false);
+    try {
+      const res = await ImagePicker.launchImageLibraryAsync();
+      if (!res.canceled && res.assets.length > 0) {
+        const uri = res.assets[0].uri;
+        setPhotoUri(uri);
+      }
+    } catch (err) {
+      console.log("Open gallery failed");
+    }
+  };
 
   return (
     <View style={styles.container}>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}
-        >
-          <View style={styles.modalView}>
-            <TouchableOpacity style={{ alignItems: "center" }}>
-              <Ionicons name="images" size={80} color={MyColors.background} />
-              <Text style={{ color: MyColors.background }}>Gallery</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{ alignItems: "center" }}>
-              <Ionicons name="camera" size={80} color={MyColors.background} />
-              <Text style={{ color: MyColors.background }}>Camera</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-        <View style={{ alignItems: "center" }}>
-          <View style={styles.addImageView}>
-            <TouchableOpacity
-              onPress={() => setModalVisible(true)}
-              style={styles.addImageButton}
-            >
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.modalView}>
+          <TouchableOpacity
+            style={{ alignItems: "center" }}
+            onPress={openGallery}
+          >
+            <Ionicons name="images" size={80} color={MyColors.background} />
+            <Text style={{ color: MyColors.background }}>Gallery</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ alignItems: "center" }}
+            onPress={openCamera}
+          >
+            <Ionicons name="camera" size={80} color={MyColors.background} />
+            <Text style={{ color: MyColors.background }}>Camera</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+      <View style={{ alignItems: "center" }}>
+        <View style={styles.addImageView}>
+          <TouchableOpacity
+            onPress={() => setModalVisible(true)}
+            style={styles.addImageButton}
+          >
+            {photoUri == "" ? (
               <Image
                 source={require("../assets/add_photo.png")}
                 style={styles.addImageButton}
               />
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.inputName}>Description</Text>
-          <LinearGradient
-            style={styles.linearGradient}
-            colors={[MyColors.gradientStart, MyColors.gradientEnd]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-          >
-            <TextInput
-              style={styles.inputField}
-              onChangeText={setDescription}
-              value={description}
-              autoCapitalize="words"
-              autoCorrect={false}
-              multiline={true}
-            />
-          </LinearGradient>
-        </View>
-        <View style={{ alignItems: "center", marginBottom: 90 }}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={{ color: MyColors.text }}>Post</Text>
+            ) : (
+              <Image source={{ uri: photoUri }} style={styles.addImageButton} />
+            )}
           </TouchableOpacity>
         </View>
+        <Text style={styles.inputName}>Description</Text>
+        <LinearGradient
+          style={styles.linearGradient}
+          colors={[MyColors.gradientStart, MyColors.gradientEnd]}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+        >
+          <TextInput
+            style={styles.inputField}
+            onChangeText={setDescription}
+            value={description}
+            autoCapitalize="words"
+            autoCorrect={false}
+            multiline={true}
+          />
+        </LinearGradient>
+      </View>
+      <View style={{ alignItems: "center", marginBottom: 90 }}>
+        <TouchableOpacity style={styles.button}>
+          <Text style={{ color: MyColors.text }}>Post</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -119,7 +157,7 @@ const styles = StyleSheet.create({
   },
   addImageView: {
     aspectRatio: 1,
-    width: '90%',
+    width: "90%",
     borderRadius: 10,
     borderWidth: 1,
     borderColor: MyColors.gray,
@@ -129,7 +167,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 75,
+    borderRadius: 10,
     aspectRatio: 1,
     height: 150,
   },

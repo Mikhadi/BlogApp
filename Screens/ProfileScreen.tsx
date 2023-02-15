@@ -91,6 +91,7 @@ const footerComponent = () => {
 }
 
 const ProfileScreen: FC = () => {
+
   return (
     <View style={styles.container}>
       <View style={{ borderBottomColor: "black", borderBottomWidth: 2, flexDirection: 'row', alignItems: 'center'}}>

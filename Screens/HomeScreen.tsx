@@ -92,6 +92,7 @@ const footerComponent = () => {
 }
 
 const HomeScreen: FC = () => {
+
   return (
     <View style={styles.container}>
       <FlatList

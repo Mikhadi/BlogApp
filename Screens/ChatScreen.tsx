@@ -36,7 +36,7 @@ const footerComponent = () => {
 const ChatScreen: FC = () => {
   const [message, setMessage] = useState("")
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container}>
       <FlatList
         style={{marginTop: 10}}
         data={posts}
@@ -75,7 +75,7 @@ const ChatScreen: FC = () => {
           <Text style={{margin: 8}}>Send</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAvoidingView>
     );
   };
 
@@ -89,8 +89,7 @@ const styles = StyleSheet.create({
       justifyContent: 'space-between',
       alignItems: 'center',
       width: '100%',
-      position: 'absolute',
-      bottom: 82,
+      marginBottom: 82,
     },
     sendButton:{
       marginRight: 10,

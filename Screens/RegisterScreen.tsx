@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   View,
   Image,
@@ -7,11 +7,14 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
+  StatusBar,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import MyColors from "../themes/myTheme";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import * as ImagePicker from "expo-image-picker";
 
 const RegisterScreen: FC<{ route: any; navigation: any }> = ({
   route,
@@ -24,6 +27,48 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
   const [hiddenPass, setHiddenPass] = useState(true);
   const [eyeIcon, setEyeIcon]: any = useState("eye-outline");
   const [modalVisible, setModalVisible] = useState(false);
+  const [avatarUri, setAvatarUri] = useState("");
+
+  const askPermission = async () => {
+    try {
+      const res = await ImagePicker.getCameraPermissionsAsync();
+      if (!res.granted) {
+        Alert.alert("Camera permission", "Camera permission is required");
+      }
+    } catch (err) {
+      console.log("Ask permission failed");
+    }
+  };
+
+  useEffect(() => {
+    askPermission();
+  }, []);
+
+  const openCamera = async () => {
+    setModalVisible(false);
+    try {
+      const res = await ImagePicker.launchCameraAsync();
+      if (!res.canceled && res.assets.length > 0) {
+        const uri = res.assets[0].uri;
+        setAvatarUri(uri);
+      }
+    } catch (err) {
+      console.log("Open camera failed");
+    }
+  };
+
+  const openGallery = async () => {
+    setModalVisible(false);
+    try {
+      const res = await ImagePicker.launchImageLibraryAsync();
+      if (!res.canceled && res.assets.length > 0) {
+        const uri = res.assets[0].uri;
+        setAvatarUri(uri);
+      }
+    } catch (err) {
+      console.log("Open gallery failed");
+    }
+  };
 
   const loginPressed = () => {
     let reg: RegExp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
@@ -44,51 +89,69 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
   };
   return (
     <View style={styles.container}>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}
-        >
-          <View style={styles.modalView}>
-            <TouchableOpacity style={{ alignItems: "center" }}>
-              <Ionicons name="images" size={80} color={MyColors.background} />
-              <Text style={{ color: MyColors.background }}>Gallery</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{ alignItems: "center" }}>
-              <Ionicons name="camera" size={80} color={MyColors.background} />
-              <Text style={{ color: MyColors.background }}>Camera</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-        <View
-          style={{ marginTop: 40, flexDirection: "row", alignItems: "center", marginBottom: 20 }}
-        >
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.modalView}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{ marginLeft: 10 }}
+            style={{ alignItems: "center" }}
+            onPress={openGallery}
           >
-            <Ionicons
-              name={"arrow-back-outline"}
-              size={30}
-              color={MyColors.text}
-            />
+            <Ionicons name="images" size={80} color={MyColors.background} />
+            <Text style={{ color: MyColors.background }}>Gallery</Text>
           </TouchableOpacity>
-          <Text style={styles.loginText}>Registration</Text>
+          <TouchableOpacity
+            style={{ alignItems: "center" }}
+            onPress={openCamera}
+          >
+            <Ionicons name="camera" size={80} color={MyColors.background} />
+            <Text style={{ color: MyColors.background }}>Camera</Text>
+          </TouchableOpacity>
         </View>
-        <KeyboardAwareScrollView>
+      </Modal>
+      <View
+        style={{
+          marginTop: 40,
+          flexDirection: "row",
+          alignItems: "center",
+          marginBottom: 20,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{ marginLeft: 10 }}
+        >
+          <Ionicons
+            name={"arrow-back-outline"}
+            size={30}
+            color={MyColors.text}
+          />
+        </TouchableOpacity>
+        <Text style={styles.loginText}>Registration</Text>
+      </View>
+      <KeyboardAwareScrollView>
         <View style={{ alignItems: "center" }}>
           <View style={styles.addImageView}>
             <TouchableOpacity
               onPress={() => setModalVisible(true)}
               style={styles.addImageButton}
             >
-              <Image
-                source={require("../assets/add_photo.png")}
-                style={styles.addImageButton}
-              />
+              {avatarUri == "" ? (
+                <Image
+                  source={require("../assets/add_photo.png")}
+                  style={styles.addImageButton}
+                />
+              ) : (
+                <Image
+                  source={{ uri: avatarUri }}
+                  style={styles.addImageButton}
+                />
+              )}
             </TouchableOpacity>
           </View>
           <Text style={styles.inputName}>Name</Text>
@@ -166,12 +229,12 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
             </TouchableOpacity>
           </LinearGradient>
         </View>
-        </KeyboardAwareScrollView>
-        <View style={{ alignItems: "center", marginBottom: 20 }}>
-          <TouchableOpacity style={styles.button} onPress={loginPressed}>
-            <Text style={{ color: MyColors.text }}>Register</Text>
-          </TouchableOpacity>
-        </View>
+      </KeyboardAwareScrollView>
+      <View style={{ alignItems: "center", marginBottom: 20 }}>
+        <TouchableOpacity style={styles.button} onPress={loginPressed}>
+          <Text style={{ color: MyColors.text }}>Register</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
