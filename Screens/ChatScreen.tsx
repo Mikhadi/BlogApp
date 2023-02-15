@@ -2,8 +2,8 @@ import { FC, useState } from "react";
 import { View, Text, StyleSheet, StatusBar, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView } from "react-native";
 
 import MyColors from "../themes/myTheme";
-import { MessageItem } from "./MessageComponent";
-import { MyMessageItem } from "./MyMessageComponent";
+import { MessageItem } from "../components/MessageComponent";
+import { MyMessageItem } from "../components/MyMessageComponent";
 
 type Message = {
   id: String;

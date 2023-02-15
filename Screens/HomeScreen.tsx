@@ -2,7 +2,7 @@ import { FC } from "react";
 import { View, Text, StyleSheet, StatusBar, FlatList } from "react-native";
 import MyColors from "../themes/myTheme";
 
-import { ListItem } from "./PostComponent";
+import { ListItem } from "../components/PostComponent";
 
 type Post = {
   name: String;

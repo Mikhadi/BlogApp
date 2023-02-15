@@ -6,11 +6,11 @@ import {
   View, Text, Image, Dimensions,
 } from "react-native";
 
-import HomeScreen from "./HomeScreen";
-import ChatScreen from "./ChatScreen";
-import ProfileScreen from "./ProfileScreen";
-import SettingsScreen from "./SettingsScreen";
-import AddPostScreen from "./AddPostScreen";
+import HomeScreen from "../Screens/HomeScreen";
+import ChatScreen from "../Screens/ChatScreen";
+import ProfileScreen from "../Screens/ProfileScreen";
+import SettingsScreen from "../Screens/SettingsScreen";
+import AddPostScreen from "../Screens/AddPostScreen";
 import MyColors from "../themes/myTheme";
 import { FC } from "react";
 
