@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { View, Text, StyleSheet, StatusBar, FlatList, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, StatusBar, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView } from "react-native";
 
 import MyColors from "../themes/myTheme";
 import { MessageItem } from "./MessageComponent";
@@ -67,6 +67,7 @@ const ChatScreen: FC = () => {
           placeholderTextColor={MyColors.text}
           autoCapitalize="none"
           autoCorrect={false}
+          multiline={true}
         >
         </TextInput>
         </View>
@@ -86,10 +87,10 @@ const styles = StyleSheet.create({
     sendBox: {
       flexDirection: 'row',
       justifyContent: 'space-between',
+      alignItems: 'center',
       width: '100%',
       position: 'absolute',
       bottom: 82,
-      alignItems: 'center',
     },
     sendButton:{
       marginRight: 10,

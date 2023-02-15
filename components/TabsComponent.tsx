@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import {
   StatusBar,
   StyleSheet,
+  View, Text, Image, Dimensions,
 } from "react-native";
 
 import HomeScreen from "./HomeScreen";
@@ -12,6 +13,23 @@ import SettingsScreen from "./SettingsScreen";
 import AddPostScreen from "./AddPostScreen";
 import MyColors from "../themes/myTheme";
 import { FC } from "react";
+
+const customHeader =() => {
+  return (
+    <View style={{
+      backgroundColor: MyColors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: 80,
+    }}>
+      <Image source={require('../assets/Logo.png')} 
+      style={{
+        height: 70,
+      }}
+      resizeMode={'center'}/>
+    </View>
+  )
+}
 
 const TabsStack: FC<{ route: any; navigation: any }> = ({
   route,
@@ -46,7 +64,7 @@ const TabsStack: FC<{ route: any; navigation: any }> = ({
           tabBarShowLabel: false,
           tabBarActiveTintColor: MyColors.primary,
           tabBarInactiveTintColor: 'rgba(200, 200, 200, 1)',
-          headerShown: false,
+          headerShown: true,
           tabBarStyle: {
             backgroundColor: 'white',
             borderRadius: 15,
@@ -56,6 +74,7 @@ const TabsStack: FC<{ route: any; navigation: any }> = ({
             left: 10, 
             right: 10,
           },
+          header: customHeader
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
