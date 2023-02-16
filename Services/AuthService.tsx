@@ -27,7 +27,25 @@ const login = async (username: String, password: String): Promise<AuthData> => {
         }, 1000);
       });
   };
+
+  const logout = async (refreshToken: any): Promise<AuthData> => {
+    const res: any = await UserAPI.logoutUser(refreshToken)
+    console.log(res)
+    return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({
+            accessToken: "",
+            refreshToken: "",
+            id: "",
+            status: res.status,
+            error: res.data?.error
+          });
+        }, 1000);
+      });
+  };
+
+
   
   export const authService = {
-    login,
+    login, logout
   };

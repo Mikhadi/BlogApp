@@ -7,7 +7,7 @@ type AuthContextData = {
   authData?: AuthData;
   loading: boolean;
   login(username: String, password: String): Promise<void>;
-  signOut(): void;
+  signOut(): Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -44,8 +44,11 @@ const AuthProvider: FC<{children:any}> = ({children}) => {
 
   const signOut = async () => {
     setLoading(true)
-    setAuthData(undefined);
-    await AsyncStorage.removeItem('@AuthData');
+    const _authData = await authService.logout(authData?.refreshToken);
+    if(_authData.status == 200){
+      setAuthData(undefined);
+      await AsyncStorage.removeItem('@AuthData');
+    }
     setLoading(false)
   };
 
