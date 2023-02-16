@@ -7,10 +7,12 @@ import {
   TouchableOpacity,
   Alert,
   StatusBar,
+  ToastAndroid
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import MyColors from "../themes/myTheme";
+import UserModel from "../Model/UserModel";
 
 const facebookPressed = () => {
   alert("Facebook presed");
@@ -24,13 +26,24 @@ const WelcomeScreen: FC<{ route: any; navigation: any}> = ({
   route,
   navigation,
 }) => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [hiddenPass, setHiddenPass] = useState(true);
   const [eyeIcon, setEyeIcon]: any = useState("eye-outline");
+  const [error, setError] = useState("")
 
-  const loginPressed = () => {
-    Alert.alert("Login pressed")
+  const loginPressed = async () => {
+    let res: any
+    try{
+      res = await UserModel.login(username, password)
+    }catch(err){
+      console.log("Failed login user")
+    }
+    if (res.status == 200){
+      Alert.alert("Success", "Access token - "+res.data.refreshToken)
+    }else{
+      setError(res.data.error)
+    }
   }
 
   const hidePass = () => {
@@ -58,8 +71,8 @@ const WelcomeScreen: FC<{ route: any; navigation: any}> = ({
         >
           <TextInput
             style={styles.inputField}
-            onChangeText={setEmail}
-            value={email}
+            onChangeText={setUsername}
+            value={username}
             placeholder="johndoe"
             placeholderTextColor={MyColors.text}
             autoCapitalize="none"
@@ -88,6 +101,7 @@ const WelcomeScreen: FC<{ route: any; navigation: any}> = ({
             <Ionicons name={eyeIcon} size={25} color={MyColors.text} />
           </TouchableOpacity>
         </LinearGradient>
+        <Text style={{color: 'red'}}>{error}</Text>
         <View
           style={{
             flexDirection: "row",

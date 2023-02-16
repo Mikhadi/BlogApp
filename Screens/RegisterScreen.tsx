@@ -9,12 +9,15 @@ import {
   Modal,
   StatusBar,
   Alert,
+  ToastAndroid,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import MyColors from "../themes/myTheme";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as ImagePicker from "expo-image-picker";
+import registerUser from "../API/UserAPI"
+import UserModel, { User } from "../Model/UserModel";
 
 const RegisterScreen: FC<{ route: any; navigation: any }> = ({
   route,
@@ -28,6 +31,7 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
   const [eyeIcon, setEyeIcon]: any = useState("eye-outline");
   const [modalVisible, setModalVisible] = useState(false);
   const [avatarUri, setAvatarUri] = useState("");
+  const [error, setError] = useState("")
 
   const askPermission = async () => {
     try {
@@ -70,12 +74,24 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
     }
   };
 
-  const loginPressed = () => {
-    let reg: RegExp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-    if (reg.test(email) === false) {
-      alert("Email is Not Correct");
-    } else {
-      alert("Email is Correct");
+  const register = async () => {
+    let res: any
+    const user: User = {
+      name: name,
+      email: email,
+      username: username,
+      password: password
+    }
+    try{
+      res = await UserModel.register(user)
+    }catch(err){
+      console.log("Failed register user")
+    }
+    if (res.status == 200){
+      ToastAndroid.show("Registered succesfully, Now you can login", ToastAndroid.LONG)
+      navigation.goBack()
+    }else{
+      setError(res.data.error)
     }
   };
 
@@ -228,10 +244,11 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
               <Ionicons name={eyeIcon} size={25} color={MyColors.text} />
             </TouchableOpacity>
           </LinearGradient>
+          <Text style={{color: 'red'}}>{error}</Text>
         </View>
       </KeyboardAwareScrollView>
       <View style={{ alignItems: "center", marginBottom: 20 }}>
-        <TouchableOpacity style={styles.button} onPress={loginPressed}>
+        <TouchableOpacity style={styles.button} onPress={register}>
           <Text style={{ color: MyColors.text }}>Register</Text>
         </TouchableOpacity>
       </View>
