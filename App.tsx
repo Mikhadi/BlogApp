@@ -1,18 +1,11 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { useEffect, useState } from "react";
-import { FC } from "react";
+import { AuthProvider } from "./Contexts/AuthContext";
+import { Router } from "./Routes/Router";
 
-import AuthStack from "./components/AuthComponent";
-import TabsStack from "./components/TabsComponent";
-
-const App: FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
-  
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+const App = () => {
   return (
-      <NavigationContainer>
-        {isAuthenticated ? <TabsStack /> : <AuthStack />}
-      </NavigationContainer>
+    <AuthProvider>
+      <Router />
+    </AuthProvider>
   );
 };
 

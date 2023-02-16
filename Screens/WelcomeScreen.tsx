@@ -6,13 +6,12 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  StatusBar,
-  ToastAndroid
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import MyColors from "../themes/myTheme";
 import UserModel from "../Model/UserModel";
+import { useAuth } from "../Contexts/AuthContext";
 
 const facebookPressed = () => {
   alert("Facebook presed");
@@ -26,24 +25,16 @@ const WelcomeScreen: FC<{ route: any; navigation: any}> = ({
   route,
   navigation,
 }) => {
+
+  const auth = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [hiddenPass, setHiddenPass] = useState(true);
   const [eyeIcon, setEyeIcon]: any = useState("eye-outline");
-  const [error, setError] = useState("")
+  const [error, setError]:any = useState(auth.authData?.error)
 
   const loginPressed = async () => {
-    let res: any
-    try{
-      res = await UserModel.login(username, password)
-    }catch(err){
-      console.log("Failed login user")
-    }
-    if (res.status == 200){
-      Alert.alert("Success", "Access token - "+res.data.refreshToken)
-    }else{
-      setError(res.data.error)
-    }
+    await auth.login(username, password);
   }
 
   const hidePass = () => {
