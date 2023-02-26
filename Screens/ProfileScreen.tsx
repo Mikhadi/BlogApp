@@ -63,8 +63,8 @@ const ProfileScreen: FC<{ route: any; navigation: any }> = ({
       setName(user!.name);
       setUsername(user!.username);
       setAvatarUri(user!.avatar);
-      onRefresh();
       setLoading(false);
+      onRefresh();
     });
     return unsubscribe;
   });
@@ -111,37 +111,39 @@ const ProfileScreen: FC<{ route: any; navigation: any }> = ({
               </Text>
             </View>
           </View>
-          {posts!.length > 0 ? (
-            <FlatList
-              data={posts}
-              keyExtractor={(post) => post.id.toString()}
-              ListFooterComponent={footerComponent}
-              renderItem={({ item }) => (
-                <ListItem
-                  id={item.id}
-                  image={item.image}
-                  text={item.message}
-                  onDeletePost={onDeletePost}
-                />
+              {posts != undefined && posts.length > 0 ? (
+                <FlatList
+                  data={posts}
+                  keyExtractor={(post) => post.id.toString()}
+                  ListFooterComponent={footerComponent}
+                  renderItem={({ item }) => (
+                    <ListItem
+                      id={item.id}
+                      image={item.image}
+                      text={item.message}
+                      onDeletePost={onDeletePost}
+                    />
+                  )}
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                    />
+                  }
+                ></FlatList>
+              ) : (
+                <Text
+                  style={{
+                    alignSelf: "center",
+                    fontWeight: "bold",
+                    fontSize: 28,
+                    color: MyColors.text,
+                    marginTop: 15,
+                  }}
+                >
+                  No Posts
+                </Text>
               )}
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }
-            ></FlatList>
-          ) : (
-            <Text
-              style={{
-                alignSelf: "center",
-                fontWeight: "bold",
-                fontSize: 28,
-                color: MyColors.text,
-                marginTop: 15,
-              }}
-            >
-              {" "}
-              No Posts{" "}
-            </Text>
-          )}
         </>
       )}
     </View>

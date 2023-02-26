@@ -24,6 +24,24 @@ const addPost = async (message: string, image: string, accessToken: any) => {
   return null;
 };
 
+const getAllPosts = async (accessToken: any) => {
+    const res: any = await PostAPI.getAllPosts(accessToken);
+    let data = Array<Post>();
+    console.log(res)
+    if (res.status == 200) {
+      res.data.post.forEach((obj: any) => {
+        const post: Post = {
+          id: obj._id,
+          message: obj.message,
+          image: obj.image,
+          sender: obj.sender,
+        };
+        data.push(post);
+      });
+    }
+    return data.reverse()
+  };
+
 const getPostsBySender = async (id: String, accessToken: any) => {
   const res: any = await PostAPI.getPostsBySender(id, accessToken);
   let data = Array<Post>();
@@ -51,4 +69,4 @@ const deletePostById = async (id: String, accessToken: any) => {
     }
   };
 
-export default { addPost, getPostsBySender, deletePostById };
+export default { addPost, getPostsBySender, deletePostById, getAllPosts };

@@ -1,7 +1,7 @@
 import apiClient from "./client";
 
-const getAllPosts = async () => {
-    return apiClient.get("/post")
+const getAllPosts = async (accessToken: any) => {
+    return apiClient.get("/post/", {}, {headers: {"Authorization": "JWT " + accessToken}})
 }
 
 const addPost = async (postJson: any, accessToken: any) => {

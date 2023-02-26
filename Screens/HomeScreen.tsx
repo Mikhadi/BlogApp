@@ -1,89 +1,10 @@
-import { FC } from "react";
-import { View, Text, StyleSheet, StatusBar, FlatList } from "react-native";
+import { FC, useCallback, useEffect, useState } from "react";
+import { View, Text, StyleSheet, StatusBar, FlatList, RefreshControl } from "react-native";
 import MyColors from "../themes/myTheme";
 
 import { ListItem } from "../components/PostComponent";
-
-type Post = {
-  name: String;
-  id: String;
-  image: any;
-  avatar: any;
-  text: String;
-};
-
-const posts: Array<Post> = [
-  {
-    name: "Misha",
-    id: "1",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  {
-    name: "Vasya",
-    id: "2",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "String",
-  },
-  {
-    name: "Misha",
-    id: "3",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  {
-    name: "Vasya",
-    id: "4",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "String",
-  },
-  {
-    name: "Misha",
-    id: "5",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  {
-    name: "Vasya",
-    id: "6",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "String",
-  },
-  {
-    name: "Misha",
-    id: "7",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  {
-    name: "Vasya",
-    id: "8",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "String",
-  },
-  {
-    name: "Misha",
-    id: "9",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  {
-    name: "Vasya",
-    id: "10",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "String",
-  },
-];
+import PostModel, { Post } from "../Model/PostModel";
+import { useAuth } from "../Contexts/AuthContext";
 
 const footerComponent = () => {
   return(
@@ -91,7 +12,35 @@ const footerComponent = () => {
   )
 }
 
-const HomeScreen: FC = () => {
+const HomeScreen: FC<{ route: any; navigation: any }> = ({
+  route,
+  navigation,
+}) => {
+  const auth = useAuth()
+
+  const [posts, setPosts] = useState<Array<Post>>();
+  const [refreshing, setRefreshing] = useState(true);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    let userPosts: Post[] = [];
+    try {
+      userPosts = await PostModel.getAllPosts(
+        auth.authData?.accessToken
+      );
+    } catch (err) {
+      console.log("Failed loading posts " + err);
+    }
+    setPosts(userPosts);
+    setRefreshing(false);
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      onRefresh();
+    });
+    return unsubscribe;
+  });
 
   return (
     <View style={styles.container}>
@@ -101,13 +50,18 @@ const HomeScreen: FC = () => {
         ListFooterComponent={footerComponent}
         renderItem={({ item }) => (
           <ListItem
-            name={item.name}
             id={item.id}
             image={item.image}
-            avatar={item.avatar}
-            text={item.text}
+            text={item.message}
+            sender={item.sender}
           />
         )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
       ></FlatList>
     </View>
   );
