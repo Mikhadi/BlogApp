@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Image,
+  StatusBar
 } from "react-native";
 
 import HomeScreen from "../Screens/HomeScreen";
@@ -11,8 +12,6 @@ import ProfileScreen from "../Screens/ProfileScreen";
 import SettingsScreen from "../Screens/SettingsScreen";
 import AddPostScreen from "../Screens/AddPostScreen";
 import MyColors from "../themes/myTheme";
-import React, { Dispatch, FC, SetStateAction } from "react";
-import { StatusBar } from "expo-status-bar";
 
 const customHeader = () => {
   return (
@@ -21,13 +20,14 @@ const customHeader = () => {
         backgroundColor: MyColors.background,
         alignItems: "center",
         justifyContent: "center",
-        height: 60,
+        height: 80,
       }}
     >
       <Image
         source={require("../assets/Logo.png")}
         style={{
           height: 70,
+          marginTop: StatusBar.currentHeight
         }}
         resizeMode={"center"}
       />

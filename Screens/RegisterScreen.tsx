@@ -80,9 +80,14 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
       name: name,
       email: email,
       username: username,
-      password: password
+      password: password,
+      avatar: "url"
     }
     try{
+      if (user.avatar != ""){
+        const url = await UserModel.uploadImage(avatarUri)
+        user.avatar = url
+      }
       res = await UserModel.register(user)
     }catch(err){
       console.log("Failed register user")

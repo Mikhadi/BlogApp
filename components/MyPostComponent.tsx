@@ -1,23 +1,40 @@
 import { Ionicons } from '@expo/vector-icons';
 import {FC} from 'react'
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
+import { useAuth } from '../Contexts/AuthContext';
+import PostModel from '../Model/PostModel';
 import MyColors from '../themes/myTheme';
 
-export const ListItem: FC<{ name: String; id: String; image: any, avatar: any, text: String }> = ({
+export const ListItem: FC<{ id: String; image: any, text: String, onDeletePost:(id: String)=>void }> = ({
   id,
   image,
-  text
+  text,
+  onDeletePost
 }) => {
+    const auth = useAuth()
+
+    const deletePost = async () => {
+        try{
+            const res = await PostModel.deletePostById(id, auth.authData?.accessToken)
+            if (res.status == 200){
+                onDeletePost(id)
+            }else{
+                onDeletePost("")
+            }
+        }catch(err){
+            console.log("Failed deleting post" + err)
+        }
+    }
   return (
     <View style={styles.container}>
-      <Image source={image} style={styles.image}/>
+      <Image source={{ uri:image }} style={styles.image}/>
       <Text style={styles.text}>{text}</Text>
       <View style={styles.buttonsView}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity onPress={()=>{alert(image+ " " + id)}} style={styles.button}>
             <Ionicons name={'pencil'} color={MyColors.text} size={20}/>
             <Text style={styles.buttonText}>Edit</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity onPress={deletePost} style={styles.button}>
             <Ionicons name={'trash'} color={MyColors.text} size={20}/>
             <Text style={styles.buttonText}>Delete</Text>
         </TouchableOpacity>
@@ -50,6 +67,7 @@ const styles = StyleSheet.create({
     image:{
         margin: 10,
         width: '95%',
+        aspectRatio: 1,
         borderRadius: 3,
     },
     text:{

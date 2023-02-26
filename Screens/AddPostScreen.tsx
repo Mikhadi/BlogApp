@@ -8,16 +8,22 @@ import {
   TouchableOpacity,
   Modal,
   StatusBar,
+  ToastAndroid,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import MyColors from "../themes/myTheme";
 import * as ImagePicker from "expo-image-picker";
+import UserModel from "../Model/UserModel";
+import PostModel from "../Model/PostModel";
+import { useAuth } from "../Contexts/AuthContext";
 
-const RegisterScreen: FC<{ route: any; navigation: any }> = ({
+const AddPostScreen: FC<{ route: any; navigation: any }> = ({
   route,
   navigation,
 }) => {
+  const auth = useAuth();
+  
   const [description, setDescription] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [photoUri, setPhotoUri] = useState("");
@@ -45,6 +51,29 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
       }
     } catch (err) {
       console.log("Open gallery failed");
+    }
+  };
+
+  const addPost = async () => {
+    let res: any
+    let url: string = ""
+    try{
+      if (photoUri != ""){
+        url = await UserModel.uploadImage(photoUri)
+      }
+      res = await PostModel.addPost(description, url, auth.authData?.accessToken)
+    }catch(err){
+      console.log("Failed adding post")
+    }
+    if ( res != null){
+      if (res.status == 200){
+        ToastAndroid.show("Post Added succesfully", ToastAndroid.LONG)
+        setDescription("")
+        setPhotoUri("")
+      }
+      else{
+        console.log("Error adding post")
+      }
     }
   };
 
@@ -109,7 +138,7 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
         </LinearGradient>
       </View>
       <View style={{ alignItems: "center", marginBottom: 90 }}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity onPress={addPost} style={styles.button}>
           <Text style={{ color: MyColors.text }}>Post</Text>
         </TouchableOpacity>
       </View>
@@ -184,4 +213,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RegisterScreen;
+export default AddPostScreen;

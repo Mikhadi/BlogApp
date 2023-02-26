@@ -1,126 +1,149 @@
-import { FC } from "react";
-import { View, Text, StyleSheet, StatusBar, Image, FlatList } from "react-native";
+import { FC, useCallback, useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  StatusBar,
+  Image,
+  FlatList,
+  ActivityIndicator,
+  ToastAndroid,
+  RefreshControl,
+} from "react-native";
 import MyColors from "../themes/myTheme";
 import { ListItem } from "../components/MyPostComponent";
-
-type Post = {
-  name: String;
-  id: String;
-  image: any;
-  avatar: any;
-  text: String;
-};
-
-const posts: Array<Post> = [
-  {
-    name: "Misha",
-    id: "1",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  {
-    name: "Vasya",
-    id: "2",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "String",
-  },
-  {
-    name: "Misha",
-    id: "3",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  {
-    name: "Vasya",
-    id: "4",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "String",
-  },
-  {
-    name: "Misha",
-    id: "5",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  {
-    name: "Vasya",
-    id: "6",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "String",
-  },
-  {
-    name: "Misha",
-    id: "7",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  {
-    name: "Vasya",
-    id: "8",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "String",
-  },
-  {
-    name: "Misha",
-    id: "9",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  },
-  {
-    name: "Vasya",
-    id: "10",
-    image: require("../assets/postImage.jpg"),
-    avatar: require("../assets/avatar.png"),
-    text: "String",
-  },
-];
+import { useAuth } from "../Contexts/AuthContext";
+import UserModel, { User } from "../Model/UserModel";
+import PostModel, { Post } from "../Model/PostModel";
 
 const footerComponent = () => {
-  return(
-    <View style={{height: 80}}/>
-  )
-}
+  return <View style={{ height: 80 }} />;
+};
 
-const ProfileScreen: FC = () => {
+const ProfileScreen: FC<{ route: any; navigation: any }> = ({
+  route,
+  navigation,
+}) => {
+  const auth = useAuth();
+  const userId: any = auth.authData?.id;
+
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [avatarUri, setAvatarUri] = useState("");
+  const [posts, setPosts] = useState<Array<Post>>();
+  const [refreshing, setRefreshing] = useState(true);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    let userPosts: Post[] = [];
+    try {
+      userPosts = await PostModel.getPostsBySender(
+        userId,
+        auth.authData?.accessToken
+      );
+    } catch (err) {
+      console.log("Failed loading posts " + err);
+    }
+    setPosts(userPosts);
+    setRefreshing(false);
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", async () => {
+      console.log("focus");
+      let user: User;
+      try {
+        user = await UserModel.getUser(userId);
+      } catch (err) {
+        console.log("Failed getting user" + err);
+      }
+      setEmail(user!.email);
+      setName(user!.name);
+      setUsername(user!.username);
+      setAvatarUri(user!.avatar);
+      onRefresh();
+      setLoading(false);
+    });
+    return unsubscribe;
+  });
+
+  const onDeletePost = (id: String) => {
+    if (id != "") {
+      onRefresh();
+    } else {
+      console.log("Post doesn't exist");
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <View style={{ borderBottomColor: "black", borderBottomWidth: 2, flexDirection: 'row', alignItems: 'center'}}>
-        <Image
-          source={require("../assets/avatar.png")}
-          style={{ height: 80, width: 80, borderRadius: 40, margin: 20 }}
-        />
-        <View>
-          <Text style={styles.bioText}>Vasya Pupkin</Text>
-          <Text style={styles.bioText}>vasya_pupkin@gmail.com</Text>
-          <Text style={[{ marginBottom: 10 }, { ...styles.bioText }]}>
-            054-8302399
-          </Text>
-        </View>
-      </View>
-      <FlatList
-        data={posts}
-        keyExtractor={(post) => post.id.toString()}
-        ListFooterComponent={footerComponent}
-        renderItem={({ item }) => (
-          <ListItem
-            name={item.name}
-            id={item.id}
-            image={item.image}
-            avatar={item.avatar}
-            text={item.text}
+      {loading ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator
+            color={MyColors.primary}
+            animating={loading}
+            size="large"
           />
-        )}
-      ></FlatList>
+        </View>
+      ) : (
+        <>
+          <View
+            style={{
+              borderBottomColor: "black",
+              borderBottomWidth: 2,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={{ uri: avatarUri }}
+              style={{ height: 80, width: 80, borderRadius: 40, margin: 20 }}
+            />
+            <View>
+              <Text style={styles.bioText}>{username}</Text>
+              <Text style={styles.bioText}>{name}</Text>
+              <Text style={[{ marginBottom: 10 }, { ...styles.bioText }]}>
+                {email}
+              </Text>
+            </View>
+          </View>
+          {posts!.length > 0 ? (
+            <FlatList
+              data={posts}
+              keyExtractor={(post) => post.id.toString()}
+              ListFooterComponent={footerComponent}
+              renderItem={({ item }) => (
+                <ListItem
+                  id={item.id}
+                  image={item.image}
+                  text={item.message}
+                  onDeletePost={onDeletePost}
+                />
+              )}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            ></FlatList>
+          ) : (
+            <Text
+              style={{
+                alignSelf: "center",
+                fontWeight: "bold",
+                fontSize: 28,
+                color: MyColors.text,
+                marginTop: 15,
+              }}
+            >
+              {" "}
+              No Posts{" "}
+            </Text>
+          )}
+        </>
+      )}
     </View>
   );
 };
