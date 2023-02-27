@@ -26,8 +26,8 @@ const register = async (user: User) => {
   }
 };
 
-const getUser = async (id: String) => {
-  const res: any = await UserAPI.getUser(id);
+const getUser = async (id: String, accessToken: any) => {
+  const res: any = await UserAPI.getUser(id, accessToken);
   const user: User = {
     name: res.data.name,
     email: res.data.email,
@@ -50,4 +50,13 @@ const uploadImage = async (imageURI: String) => {
   }
 };
 
-export default { register, getUser, uploadImage };
+const updateUser = async (dataJson:any, accessToken: any) => {
+  const res = await UserAPI.updateUser(dataJson, accessToken)
+  if (res.status == 200){
+    console.log(res)
+  }else{
+    console.log("Failed updating user")
+  }
+}
+
+export default { register, getUser, uploadImage, updateUser };

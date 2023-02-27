@@ -1,17 +1,15 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  View,
-  Image,
-  StatusBar
-} from "react-native";
+import { View, Image, StatusBar, StyleSheet } from "react-native";
 
 import HomeScreen from "../Screens/HomeScreen";
 import ChatScreen from "../Screens/ChatScreen";
-import ProfileScreen from "../Screens/ProfileScreen";
 import SettingsScreen from "../Screens/SettingsScreen";
 import AddPostScreen from "../Screens/AddPostScreen";
+import ProfileNav from "./MyProfileNavComponent";
+import SettingsNav from "./SettingsNavComponent";
 import MyColors from "../themes/myTheme";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 const customHeader = () => {
   return (
@@ -27,7 +25,7 @@ const customHeader = () => {
         source={require("../assets/Logo.png")}
         style={{
           height: 70,
-          marginTop: StatusBar.currentHeight
+          marginTop: StatusBar.currentHeight,
         }}
         resizeMode={"center"}
       />
@@ -52,9 +50,9 @@ const TabsStack = () => {
           } else if (route.name === "Post") {
             iconName = "add-circle";
             iconSize = 45;
-          } else if (route.name === "Profile") {
+          } else if (route.name === "ProfileNav") {
             iconName = focused ? "person" : "person-outline";
-          } else if (route.name === "Settings") {
+          } else if (route.name === "SettingsNav") {
             iconName = focused ? "settings" : "settings-outline";
           }
           return <Ionicons name={iconName} size={iconSize} color={color} />;
@@ -63,26 +61,57 @@ const TabsStack = () => {
         tabBarActiveTintColor: MyColors.primary,
         tabBarInactiveTintColor: "rgba(200, 200, 200, 1)",
         headerShown: true,
-        tabBarStyle: {
-          backgroundColor: "white",
-          borderRadius: 15,
-          height: 70,
-          position: "absolute",
-          bottom: 10,
-          left: 10,
-          right: 10,
-        },
-        tabBarHideOnKeyboard : true,
+        tabBarStyle: styles.tabBar,
+        tabBarHideOnKeyboard: true,
         header: customHeader,
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Chat" component={ChatScreen} />
       <Tab.Screen name="Post" component={AddPostScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="ProfileNav" component={ProfileNav} 
+      options={({ route }) => ({
+        tabBarStyle: ((route) => {
+          const routeName = getFocusedRouteNameFromRoute(route);
+          if (routeName == "Edit Post") {
+            return { display: "none" };
+          }
+          if (routeName == "Profile") {
+            return styles.tabBar
+          }
+          return;
+        })(route),
+      })}/>
+      <Tab.Screen
+        name="SettingsNav"
+        component={SettingsNav}
+        options={({ route }) => ({
+          tabBarStyle: ((route) => {
+            const routeName = getFocusedRouteNameFromRoute(route);
+            if (routeName == "Edit Profile") {
+              return { display: "none" };
+            }
+            if (routeName == "Settings") {
+              return styles.tabBar
+            }
+            return;
+          })(route),
+        })}
+      />
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: "white",
+    borderRadius: 15,
+    height: 70,
+    position: "absolute",
+    bottom: 10,
+    left: 10,
+    right: 10,
+  },
+});
 
 export default TabsStack;

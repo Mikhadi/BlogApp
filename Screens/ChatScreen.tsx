@@ -1,5 +1,5 @@
-import { FC, useState } from "react";
-import { View, Text, StyleSheet, StatusBar, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView } from "react-native";
+import { FC, useEffect, useState } from "react";
+import { View, Text, StyleSheet, StatusBar, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView, Keyboard } from "react-native";
 
 import MyColors from "../themes/myTheme";
 import { MessageItem } from "../components/MessageComponent";
@@ -35,6 +35,29 @@ const footerComponent = () => {
 
 const ChatScreen: FC = () => {
   const [message, setMessage] = useState("")
+  const [bottomMargin, setBottomMargin] = useState(85);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setBottomMargin(15)
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setBottomMargin(85)
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
+
     return (
       <KeyboardAvoidingView style={styles.container}>
       <FlatList
@@ -57,7 +80,7 @@ const ChatScreen: FC = () => {
         )}
         snapToOffsets={[40]}
       ></FlatList>
-      <View style={styles.sendBox}>
+      <View style={{...styles.sendBox, marginBottom: bottomMargin}}>
         <View style={styles.inputMessageBox}>
         <TextInput
           style={styles.messageText}
@@ -89,7 +112,6 @@ const styles = StyleSheet.create({
       justifyContent: 'space-between',
       alignItems: 'center',
       width: '100%',
-      marginBottom: 82,
     },
     sendButton:{
       marginRight: 10,

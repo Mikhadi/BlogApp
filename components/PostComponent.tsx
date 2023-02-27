@@ -1,5 +1,6 @@
 import { FC, useState } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
+import { useAuth } from "../Contexts/AuthContext";
 import UserModel, { User } from "../Model/UserModel";
 import MyColors from "../themes/myTheme";
 
@@ -9,13 +10,15 @@ export const ListItem: FC<{
   text: String;
   sender: String;
 }> = ({ id, image, text, sender }) => {
+  const auth = useAuth()
+
   const [avatar, setAvatar] = useState("");
   const [username, setUsername] = useState("");
 
   const getData = async () => {
     let user: User;
     try {
-      user = await UserModel.getUser(sender);
+      user = await UserModel.getUser(sender, auth.authData?.accessToken);
       setAvatar(user.avatar);
       setUsername(user.username);
     } catch (err) {

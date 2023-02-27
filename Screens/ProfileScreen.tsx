@@ -3,11 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
-  StatusBar,
   Image,
   FlatList,
   ActivityIndicator,
-  ToastAndroid,
   RefreshControl,
 } from "react-native";
 import MyColors from "../themes/myTheme";
@@ -55,7 +53,7 @@ const ProfileScreen: FC<{ route: any; navigation: any }> = ({
       console.log("focus");
       let user: User;
       try {
-        user = await UserModel.getUser(userId);
+        user = await UserModel.getUser(userId, auth.authData?.accessToken);
       } catch (err) {
         console.log("Failed getting user" + err);
       }
@@ -76,6 +74,10 @@ const ProfileScreen: FC<{ route: any; navigation: any }> = ({
       console.log("Post doesn't exist");
     }
   };
+
+  const onEditPost = async (id: String) => {
+    navigation.navigate("Edit Post", { postId: id })
+  }
 
   return (
     <View style={styles.container}>
@@ -122,6 +124,7 @@ const ProfileScreen: FC<{ route: any; navigation: any }> = ({
                       image={item.image}
                       text={item.message}
                       onDeletePost={onDeletePost}
+                      onEditPost={onEditPost}
                     />
                   )}
                   refreshControl={

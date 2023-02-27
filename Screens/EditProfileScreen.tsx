@@ -17,7 +17,7 @@ import * as ImagePicker from "expo-image-picker";
 import UserModel, { User } from "../Model/UserModel";
 import Modal from "react-native-modal";
 
-const RegisterScreen: FC<{ route: any; navigation: any }> = ({
+const EditProfileScreen: FC<{ route: any; navigation: any }> = ({
   route,
   navigation,
 }) => {
@@ -30,21 +30,6 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [avatarUri, setAvatarUri] = useState("");
   const [error, setError] = useState("")
-
-  const askPermission = async () => {
-    try {
-      const res = await ImagePicker.getCameraPermissionsAsync();
-      if (!res.granted) {
-        Alert.alert("Camera permission", "Camera permission is required");
-      }
-    } catch (err) {
-      console.log("Ask permission failed");
-    }
-  };
-
-  useEffect(() => {
-    askPermission();
-  }, []);
 
   const openCamera = async () => {
     setModalVisible(false);
@@ -72,31 +57,31 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
     }
   };
 
-  const register = async () => {
-    let res: any
-    const user: User = {
-      name: name,
-      email: email,
-      username: username,
-      password: password,
-      avatar: "url"
-    }
-    try{
-      if (user.avatar != ""){
-        const url = await UserModel.uploadImage(avatarUri)
-        user.avatar = url
-      }
-      res = await UserModel.register(user)
-    }catch(err){
-      console.log("Failed register user")
-    }
-    if (res.status == 200){
-      ToastAndroid.show("Registered succesfully, Now you can login", ToastAndroid.LONG)
-      navigation.goBack()
-    }else{
-      setError(res.data.error)
-    }
-  };
+//   const register = async () => {
+//     let res: any
+//     const user: User = {
+//       name: name,
+//       email: email,
+//       username: username,
+//       password: password,
+//       avatar: "url"
+//     }
+//     try{
+//       if (user.avatar != ""){
+//         const url = await UserModel.uploadImage(avatarUri)
+//         user.avatar = url
+//       }
+//       res = await UserModel.register(user)
+//     }catch(err){
+//       console.log("Failed register user")
+//     }
+//     if (res.status == 200){
+//       ToastAndroid.show("Registered succesfully, Now you can login", ToastAndroid.LONG)
+//       navigation.goBack()
+//     }else{
+//       setError(res.data.error)
+//     }
+//   };
 
   const hidePass = () => {
     setHiddenPass(!hiddenPass);
@@ -106,6 +91,7 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
       setEyeIcon("eye-outline");
     }
   };
+
   return (
     <View style={styles.container}>
       <Modal
@@ -136,26 +122,6 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
           </TouchableOpacity>
         </View>
       </Modal>
-      <View
-        style={{
-          marginTop: 40,
-          flexDirection: "row",
-          alignItems: "center",
-          marginBottom: 20,
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{ marginLeft: 10 }}
-        >
-          <Ionicons
-            name={"arrow-back-outline"}
-            size={30}
-            color={MyColors.text}
-          />
-        </TouchableOpacity>
-        <Text style={styles.loginText}>Registration</Text>
-      </View>
       <KeyboardAwareScrollView>
         <View style={{ alignItems: "center" }}>
           <View style={styles.addImageView}>
@@ -253,9 +219,12 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
           <Text style={{color: 'red'}}>{error}</Text>
         </View>
       </KeyboardAwareScrollView>
-      <View style={{ alignItems: "center", marginBottom: 20 }}>
-        <TouchableOpacity style={styles.button} onPress={register}>
-          <Text style={{ color: MyColors.text }}>Register</Text>
+      <View style={{ alignItems: "center", marginBottom: 10, flexDirection: 'row', justifyContent: 'center' }}>
+      <TouchableOpacity style={styles.button} onPress={()=>navigation.goBack()}>
+          <Text style={{ color: MyColors.text }}>Cancel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={()=>alert("Save")}>
+          <Text style={{ color: MyColors.text }}>Save</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -267,11 +236,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-between",
     backgroundColor: MyColors.background,
-  },
-  loginText: {
-    color: MyColors.text,
-    fontSize: 40,
-    fontWeight: "bold",
   },
   linearGradient: {
     flexDirection: "row",
@@ -293,9 +257,9 @@ const styles = StyleSheet.create({
     color: MyColors.text,
   },
   button: {
+    flex: 1,
     height: 52,
-    width: "80%",
-    margin: 12,
+    margin: 15,
     borderRadius: 8,
     backgroundColor: MyColors.primary,
     alignItems: "center",
@@ -329,4 +293,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RegisterScreen;
+export default EditProfileScreen;

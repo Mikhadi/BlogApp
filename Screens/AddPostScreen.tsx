@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   View,
   Image,
@@ -6,9 +6,9 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Modal,
-  StatusBar,
   ToastAndroid,
+  ScrollView,
+  Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -17,6 +17,7 @@ import * as ImagePicker from "expo-image-picker";
 import UserModel from "../Model/UserModel";
 import PostModel from "../Model/PostModel";
 import { useAuth } from "../Contexts/AuthContext";
+import Modal from "react-native-modal";
 
 const AddPostScreen: FC<{ route: any; navigation: any }> = ({
   route,
@@ -27,6 +28,7 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
   const [description, setDescription] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [photoUri, setPhotoUri] = useState("");
+  const [bottomMargin, setBottomMargin] = useState(80);
 
   const openCamera = async () => {
     setModalVisible(false);
@@ -77,16 +79,40 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
     }
   };
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setBottomMargin(0)
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setBottomMargin(80)
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   return (
     <View style={styles.container}>
+      <ScrollView>
       <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-      >
+          isVisible={modalVisible}
+          backdropOpacity={0}
+          onBackdropPress={() => {
+            setModalVisible(false);
+          }}
+          style={{
+            justifyContent: 'center',
+            alignItems:'center',
+          }}
+        >
         <View style={styles.modalView}>
           <TouchableOpacity
             style={{ alignItems: "center" }}
@@ -121,6 +147,7 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
           </TouchableOpacity>
         </View>
         <Text style={styles.inputName}>Description</Text>
+
         <LinearGradient
           style={styles.linearGradient}
           colors={[MyColors.gradientStart, MyColors.gradientEnd]}
@@ -137,11 +164,13 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
           />
         </LinearGradient>
       </View>
-      <View style={{ alignItems: "center", marginBottom: 90 }}>
+      
+      <View style={{ alignItems: "center", marginBottom: bottomMargin }}>
         <TouchableOpacity onPress={addPost} style={styles.button}>
           <Text style={{ color: MyColors.text }}>Post</Text>
         </TouchableOpacity>
       </View>
+      </ScrollView>
     </View>
   );
 };
@@ -149,13 +178,7 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "space-between",
     backgroundColor: MyColors.background,
-  },
-  loginText: {
-    color: MyColors.text,
-    fontSize: 40,
-    fontWeight: "bold",
   },
   linearGradient: {
     flexDirection: "row",
@@ -186,7 +209,7 @@ const styles = StyleSheet.create({
   },
   addImageView: {
     aspectRatio: 1,
-    width: "90%",
+    width: "70%",
     borderRadius: 10,
     borderWidth: 1,
     borderColor: MyColors.gray,

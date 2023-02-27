@@ -5,11 +5,12 @@ import { useAuth } from '../Contexts/AuthContext';
 import PostModel from '../Model/PostModel';
 import MyColors from '../themes/myTheme';
 
-export const ListItem: FC<{ id: String; image: any, text: String, onDeletePost:(id: String)=>void }> = ({
+export const ListItem: FC<{ id: String; image: any, text: String, onDeletePost:(id: String)=>void, onEditPost:(id: String)=>void, }> = ({
   id,
   image,
   text,
-  onDeletePost
+  onDeletePost,
+  onEditPost
 }) => {
     const auth = useAuth()
 
@@ -25,12 +26,13 @@ export const ListItem: FC<{ id: String; image: any, text: String, onDeletePost:(
             console.log("Failed deleting post" + err)
         }
     }
+
   return (
     <View style={styles.container}>
       <Image source={{ uri:image }} style={styles.image}/>
       <Text style={styles.text}>{text}</Text>
       <View style={styles.buttonsView}>
-        <TouchableOpacity onPress={()=>{alert(image+ " " + id)}} style={styles.button}>
+        <TouchableOpacity onPress={()=>{onEditPost(id)}} style={styles.button}>
             <Ionicons name={'pencil'} color={MyColors.text} size={20}/>
             <Text style={styles.buttonText}>Edit</Text>
         </TouchableOpacity>
