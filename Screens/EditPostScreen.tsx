@@ -110,10 +110,6 @@ const EditPostScreen: FC<{ route: any; navigation: any }> = ({
     return unsubscribe;
   }, [navigation]);
 
-  useEffect(() => {
-    console.log("imageUpdated " + imageUpdated);
-  }, [imageUpdated]);
-
   if(loading){
     return <Loading/>
   }

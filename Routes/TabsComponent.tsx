@@ -76,10 +76,9 @@ const TabsStack = () => {
           if (routeName == "Edit Post") {
             return { display: "none" };
           }
-          if (routeName == "Profile") {
+          else{
             return styles.tabBar
           }
-          return;
         })(route),
       })}/>
       <Tab.Screen
@@ -91,10 +90,9 @@ const TabsStack = () => {
             if (routeName == "Edit Profile") {
               return { display: "none" };
             }
-            if (routeName == "Settings") {
+            else {
               return styles.tabBar
             }
-            return;
           })(route),
         })}
       />
