@@ -16,7 +16,6 @@ const addPost = async (message: string, image: string, accessToken: any) => {
   };
   try {
     const res = await PostAPI.addPost(data, accessToken);
-    console.log(res);
     return res;
   } catch (err) {
     console.log("Adding Post failed" + err);
@@ -27,7 +26,6 @@ const addPost = async (message: string, image: string, accessToken: any) => {
 const getAllPosts = async (accessToken: any) => {
   const res: any = await PostAPI.getAllPosts(accessToken);
   let data = Array<Post>();
-  console.log(res);
   if (res.status == 200) {
     res.data.post.forEach((obj: any) => {
       const post: Post = {
@@ -62,7 +60,6 @@ const getPostsBySender = async (id: String, accessToken: any) => {
 const deletePostById = async (id: String, accessToken: any) => {
   try {
     const res: any = await PostAPI.deletePostsById(id, accessToken);
-    console.log(res);
     return res;
   } catch (err) {
     console.log("Failed deleting post" + err);
@@ -78,7 +75,6 @@ const getPostById = async (id: String, accessToken: any) => {
   };
   try {
     const res: any = await PostAPI.getPostsById(id, accessToken);
-    console.log(res);
     if (res.status == 200) {
       post.id = id.toString();
       post.message = res.data.post.message;
@@ -95,7 +91,6 @@ const updatePost = async (id: String, data: any, accessToken: any) => {
   let res: any
   try {
     res = await PostAPI.updatePost(id, data, accessToken);
-    console.log(res);
   } catch (err) {
     console.log("Failed getting post" + err);
   }

@@ -29,6 +29,8 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [photoUri, setPhotoUri] = useState("");
   const [bottomMargin, setBottomMargin] = useState(80);
+  const [loading, setLoading] = useState(false);
+
 
   const openCamera = async () => {
     setModalVisible(false);
@@ -57,11 +59,17 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
   };
 
   const addPost = async () => {
+    setLoading(true)
     let res: any
     let url: string = ""
     try{
       if (photoUri != ""){
         url = await UserModel.uploadImage(photoUri)
+        if(url == ""){
+          ToastAndroid.show("NETWORK_ERROR, TRY AGAIN", ToastAndroid.SHORT)
+          setLoading(false)
+          return
+        }
       }
       res = await PostModel.addPost(description, url, auth.authData?.accessToken)
     }catch(err){
@@ -72,6 +80,7 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
         ToastAndroid.show("Post Added succesfully", ToastAndroid.LONG)
         setDescription("")
         setPhotoUri("")
+        setLoading(false)
       }
       else{
         console.log("Error adding post")

@@ -50,7 +50,6 @@ const ProfileScreen: FC<{ route: any; navigation: any }> = ({
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
-      console.log("focus");
       let user: User;
       try {
         user = await UserModel.getUser(userId, auth.authData?.accessToken);

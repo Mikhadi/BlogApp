@@ -27,15 +27,19 @@ const register = async (user: User) => {
 };
 
 const getUser = async (id: String, accessToken: any) => {
-  const res: any = await UserAPI.getUser(id, accessToken);
-  const user: User = {
-    name: res.data.name,
-    email: res.data.email,
-    username: res.data.username,
+  let user: User = {
+    name: "",
+    email: "",
+    username: "",
     password: "",
-    avatar: res.data.avatar_url
-  };
-  return user!;
+    avatar: ""
+  }
+  const res: any = await UserAPI.getUser(id, accessToken);
+    user.name = res.data.name
+    user.email = res.data.email
+    user.username = res.data.username
+    user.avatar = res.data.avatar_url
+  return user;
 };
 
 const uploadImage = async (imageURI: String) => {
@@ -52,11 +56,7 @@ const uploadImage = async (imageURI: String) => {
 
 const updateUser = async (dataJson:any, accessToken: any) => {
   const res = await UserAPI.updateUser(dataJson, accessToken)
-  if (res.status == 200){
-    console.log(res)
-  }else{
-    console.log("Failed updating user")
-  }
+  return res
 }
 
 export default { register, getUser, uploadImage, updateUser };

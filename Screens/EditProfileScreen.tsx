@@ -16,11 +16,15 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import * as ImagePicker from "expo-image-picker";
 import UserModel, { User } from "../Model/UserModel";
 import Modal from "react-native-modal";
+import { useAuth } from "../Contexts/AuthContext";
+import { Loading } from "../components/Loading";
 
 const EditProfileScreen: FC<{ route: any; navigation: any }> = ({
   route,
   navigation,
 }) => {
+  const auth = useAuth();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -29,7 +33,9 @@ const EditProfileScreen: FC<{ route: any; navigation: any }> = ({
   const [eyeIcon, setEyeIcon]: any = useState("eye-outline");
   const [modalVisible, setModalVisible] = useState(false);
   const [avatarUri, setAvatarUri] = useState("");
-  const [error, setError] = useState("")
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [imageModified, setImageModified] = useState(false);
 
   const openCamera = async () => {
     setModalVisible(false);
@@ -38,6 +44,7 @@ const EditProfileScreen: FC<{ route: any; navigation: any }> = ({
       if (!res.canceled && res.assets.length > 0) {
         const uri = res.assets[0].uri;
         setAvatarUri(uri);
+        setImageModified(true);
       }
     } catch (err) {
       console.log("Open camera failed");
@@ -51,37 +58,66 @@ const EditProfileScreen: FC<{ route: any; navigation: any }> = ({
       if (!res.canceled && res.assets.length > 0) {
         const uri = res.assets[0].uri;
         setAvatarUri(uri);
+        setImageModified(true);
       }
     } catch (err) {
       console.log("Open gallery failed");
     }
   };
 
-//   const register = async () => {
-//     let res: any
-//     const user: User = {
-//       name: name,
-//       email: email,
-//       username: username,
-//       password: password,
-//       avatar: "url"
-//     }
-//     try{
-//       if (user.avatar != ""){
-//         const url = await UserModel.uploadImage(avatarUri)
-//         user.avatar = url
-//       }
-//       res = await UserModel.register(user)
-//     }catch(err){
-//       console.log("Failed register user")
-//     }
-//     if (res.status == 200){
-//       ToastAndroid.show("Registered succesfully, Now you can login", ToastAndroid.LONG)
-//       navigation.goBack()
-//     }else{
-//       setError(res.data.error)
-//     }
-//   };
+  const onSaveCallback = async () => {
+    setLoading(true)
+    let res: any;
+    let dataJson: Object = {
+      username: username,
+      name: name,
+      email: email,
+    };
+    if (imageModified) {
+      const url = await UserModel.uploadImage(avatarUri)
+      if(url == ""){
+        ToastAndroid.show("NETWORK_ERROR, TRY AGAIN", ToastAndroid.SHORT)
+        setLoading(false)
+        return
+      }
+      Object.assign(dataJson, { avatar_url: url });
+    }
+    if (password != "") {
+      Object.assign(dataJson, { password: password });
+    }
+    try{
+      res = await UserModel.updateUser(dataJson, auth.authData?.accessToken)
+      if(res.status == 200){
+        ToastAndroid.show("Profile Updated", ToastAndroid.SHORT)
+        navigation.goBack()
+      }else{
+        setError(res.data.error)
+      }
+      setLoading(false)
+    }catch(err){
+      console.log("Error updating profile " + err)
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", async () => {
+      let user: User;
+      try {
+        user = await UserModel.getUser(
+          auth.authData!.id,
+          auth.authData?.accessToken
+        );
+      } catch (err) {
+        console.log("Failed getting user" + err);
+      }
+      setEmail(user!.email);
+      setName(user!.name);
+      setUsername(user!.username);
+      setAvatarUri(user!.avatar);
+      setLoading(false);
+    });
+    return unsubscribe;
+  });
 
   const hidePass = () => {
     setHiddenPass(!hiddenPass);
@@ -92,19 +128,22 @@ const EditProfileScreen: FC<{ route: any; navigation: any }> = ({
     }
   };
 
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <View style={styles.container}>
       <Modal
-          isVisible={modalVisible}
-          backdropOpacity={0}
-          onBackdropPress={() => {
-            setModalVisible(false);
-          }}
-          style={{
-            justifyContent: 'center',
-            alignItems:'center',
-          }}
-        >
+        isVisible={modalVisible}
+        backdropOpacity={0}
+        onBackdropPress={() => {
+          setModalVisible(false);
+        }}
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <View style={styles.modalView}>
           <TouchableOpacity
             style={{ alignItems: "center" }}
@@ -216,14 +255,24 @@ const EditProfileScreen: FC<{ route: any; navigation: any }> = ({
               <Ionicons name={eyeIcon} size={25} color={MyColors.text} />
             </TouchableOpacity>
           </LinearGradient>
-          <Text style={{color: 'red'}}>{error}</Text>
+          <Text style={{ color: "red" }}>{error}</Text>
         </View>
       </KeyboardAwareScrollView>
-      <View style={{ alignItems: "center", marginBottom: 10, flexDirection: 'row', justifyContent: 'center' }}>
-      <TouchableOpacity style={styles.button} onPress={()=>navigation.goBack()}>
+      <View
+        style={{
+          alignItems: "center",
+          marginBottom: 10,
+          flexDirection: "row",
+          justifyContent: "center",
+        }}
+      >
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.goBack()}
+        >
           <Text style={{ color: MyColors.text }}>Cancel</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={()=>alert("Save")}>
+        <TouchableOpacity style={styles.button} onPress={onSaveCallback}>
           <Text style={{ color: MyColors.text }}>Save</Text>
         </TouchableOpacity>
       </View>

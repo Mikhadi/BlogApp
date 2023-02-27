@@ -19,6 +19,7 @@ import PostModel, { Post } from "../Model/PostModel";
 import { useAuth } from "../Contexts/AuthContext";
 import Modal  from "react-native-modal"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Loading } from "../components/Loading";
 
 const EditPostScreen: FC<{ route: any; navigation: any }> = ({
   route,
@@ -62,12 +63,17 @@ const EditPostScreen: FC<{ route: any; navigation: any }> = ({
   };
 
   const savePost = async () => {
+    setLoading(true);
     let res: any;
     let url: string = "";
     try {
-      setLoading(true);
       if (imageUpdated) {
         url = await UserModel.uploadImage(photoUri);
+        if(url == ""){
+          ToastAndroid.show("NETWORK_ERROR, TRY AGAIN", ToastAndroid.SHORT)
+          setLoading(false)
+          return
+        }
       } else {
         url = photoUri;
       }
@@ -108,6 +114,9 @@ const EditPostScreen: FC<{ route: any; navigation: any }> = ({
     console.log("imageUpdated " + imageUpdated);
   }, [imageUpdated]);
 
+  if(loading){
+    return <Loading/>
+  }
   return (
     <View style={styles.container}>
         <Modal
