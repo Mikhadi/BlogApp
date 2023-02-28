@@ -10,6 +10,8 @@ import ProfileNav from "./MyProfileNavComponent";
 import SettingsNav from "./SettingsNavComponent";
 import MyColors from "../themes/myTheme";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+import { useAuth } from "../Contexts/AuthContext";
+import { useEffect } from "react";
 
 const customHeader = () => {
   return (

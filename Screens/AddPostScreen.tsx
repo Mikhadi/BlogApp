@@ -167,7 +167,7 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
             style={styles.inputField}
             onChangeText={setDescription}
             value={description}
-            autoCapitalize="words"
+            autoCapitalize='sentences'
             autoCorrect={false}
             multiline={true}
           />

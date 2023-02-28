@@ -29,6 +29,9 @@ const SettingsScreen: FC<{ route: any; navigation: any }> = ({
           justifyContent: "center",
           alignItems: "center",
         }}
+        onBackButtonPress={()=>{
+          setModal(false)
+        }}
       >
         <View style={styles.modalView}>
           <Text style={{ textAlign: "center", fontFamily: "sans-serif" }}>
