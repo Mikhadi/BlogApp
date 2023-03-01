@@ -16,14 +16,6 @@ import * as Facebook from "expo-auth-session/providers/facebook"
 
 WebBrowser.maybeCompleteAuthSession();
 
-const facebookPressed = () => {
-  alert("Facebook presed");
-};
-
-const googlePressed = () => {
-  alert("Google presed");
-};
-
 const WelcomeScreen: FC<{ route: any; navigation: any}> = ({
   route,
   navigation,
@@ -96,10 +88,6 @@ const WelcomeScreen: FC<{ route: any; navigation: any}> = ({
       console.log("Error - "+ error)
     }
   };
-
-  useEffect(()=>{
-    console.log("WElcome screen created")
-  }, [])
 
 
   const auth = useAuth();

@@ -13,6 +13,7 @@ import { ListItem } from "../components/MyPostComponent";
 import { useAuth } from "../Contexts/AuthContext";
 import UserModel, { User } from "../Model/UserModel";
 import PostModel, { Post } from "../Model/PostModel";
+import { Loading } from "../components/Loading";
 
 const footerComponent = () => {
   return <View style={{ height: 80 }} />;
@@ -75,78 +76,65 @@ const ProfileScreen: FC<{ route: any; navigation: any }> = ({
   };
 
   const onEditPost = async (id: String) => {
-    navigation.navigate("Edit Post", { postId: id })
+    navigation.navigate("Edit Post", { postId: id });
+  };
+
+  if (loading) {
+    return <Loading />;
   }
 
   return (
     <View style={styles.container}>
-      {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator
-            color={MyColors.primary}
-            animating={loading}
-            size="large"
-          />
+      <View
+        style={{
+          borderBottomColor: "black",
+          borderBottomWidth: 2,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          source={{ uri: avatarUri }}
+          style={{ height: 80, width: 80, borderRadius: 40, margin: 20 }}
+        />
+        <View>
+          <Text style={styles.bioText}>{username}</Text>
+          <Text style={styles.bioText}>{name}</Text>
+          <Text style={[{ marginBottom: 10 }, { ...styles.bioText }]}>
+            {email}
+          </Text>
         </View>
-      ) : (
-        <>
-          <View
-            style={{
-              borderBottomColor: "black",
-              borderBottomWidth: 2,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={{ uri: avatarUri }}
-              style={{ height: 80, width: 80, borderRadius: 40, margin: 20 }}
+      </View>
+      {posts != undefined && posts.length > 0 ? (
+        <FlatList
+          data={posts}
+          keyExtractor={(post) => post.id.toString()}
+          ListFooterComponent={footerComponent}
+          renderItem={({ item }) => (
+            <ListItem
+              id={item.id}
+              image={item.image}
+              text={item.message}
+              onDeletePost={onDeletePost}
+              onEditPost={onEditPost}
             />
-            <View>
-              <Text style={styles.bioText}>{username}</Text>
-              <Text style={styles.bioText}>{name}</Text>
-              <Text style={[{ marginBottom: 10 }, { ...styles.bioText }]}>
-                {email}
-              </Text>
-            </View>
-          </View>
-              {posts != undefined && posts.length > 0 ? (
-                <FlatList
-                  data={posts}
-                  keyExtractor={(post) => post.id.toString()}
-                  ListFooterComponent={footerComponent}
-                  renderItem={({ item }) => (
-                    <ListItem
-                      id={item.id}
-                      image={item.image}
-                      text={item.message}
-                      onDeletePost={onDeletePost}
-                      onEditPost={onEditPost}
-                    />
-                  )}
-                  refreshControl={
-                    <RefreshControl
-                      refreshing={refreshing}
-                      onRefresh={onRefresh}
-                    />
-                  }
-                ></FlatList>
-              ) : (
-                <Text
-                  style={{
-                    alignSelf: "center",
-                    fontWeight: "bold",
-                    fontSize: 28,
-                    color: MyColors.text,
-                    marginTop: 15,
-                  }}
-                >
-                  No Posts
-                </Text>
-              )}
-        </>
+          )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        ></FlatList>
+      ) : (
+        <Text
+          style={{
+            alignSelf: "center",
+            fontWeight: "bold",
+            fontSize: 28,
+            color: MyColors.text,
+            marginTop: 15,
+          }}
+        >
+          No Posts
+        </Text>
       )}
     </View>
   );

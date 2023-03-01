@@ -21,4 +21,8 @@ const updateUser = async(dataJson: any, accessToken: any) => {
     return apiClient.put("/user", dataJson, {headers: {"Authorization": "JWT " + accessToken}})
 }
 
-export default { registerUser, loginUser, logoutUser, getUser, updateUser }
+const refreshAccessToken = async(refreshToken: any) => {
+    return apiClient.get("/auth/refresh", {}, {headers: {"Authorization": "JWT " + refreshToken}})
+}
+
+export default { registerUser, loginUser, logoutUser, getUser, updateUser, refreshAccessToken }

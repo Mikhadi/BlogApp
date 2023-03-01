@@ -7,7 +7,7 @@ export type User = {
   email: string;
   username: string;
   password: string;
-  avatar: string
+  avatar: string;
 };
 
 const register = async (user: User) => {
@@ -16,7 +16,7 @@ const register = async (user: User) => {
     email: user.email,
     username: user.username,
     password: user.password,
-    avatar_url: user.avatar
+    avatar_url: user.avatar,
   };
   try {
     const res: any = await UserAPI.registerUser(data);
@@ -32,13 +32,13 @@ const getUser = async (id: String, accessToken: any) => {
     email: "",
     username: "",
     password: "",
-    avatar: ""
-  }
+    avatar: "",
+  };
   const res: any = await UserAPI.getUser(id, accessToken);
-    user.name = res.data.name
-    user.email = res.data.email
-    user.username = res.data.username
-    user.avatar = res.data.avatar_url
+  user.name = res.data.name;
+  user.email = res.data.email;
+  user.username = res.data.username;
+  user.avatar = res.data.avatar_url;
   return user;
 };
 
@@ -48,15 +48,15 @@ const uploadImage = async (imageURI: String) => {
   let url = "/file/";
   const res: any = await apiClient.post(url, body);
   if (!res.ok) {
-    return ""
+    return "";
   } else {
-    return res.data.url
+    return res.data.url;
   }
 };
 
-const updateUser = async (dataJson:any, accessToken: any) => {
-  const res = await UserAPI.updateUser(dataJson, accessToken)
-  return res
-}
+const updateUser = async (dataJson: any, accessToken: any) => {
+  const res = await UserAPI.updateUser(dataJson, accessToken);
+  return res;
+};
 
 export default { register, getUser, uploadImage, updateUser };

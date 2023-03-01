@@ -1,6 +1,4 @@
-import apiClient from "../API/client";
 import PostAPI from "../API/PostAPI";
-import UserModel from "./UserModel";
 
 export type Post = {
   id: string;

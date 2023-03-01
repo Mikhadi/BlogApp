@@ -18,6 +18,7 @@ import UserModel from "../Model/UserModel";
 import PostModel from "../Model/PostModel";
 import { useAuth } from "../Contexts/AuthContext";
 import Modal from "react-native-modal";
+import { Loading } from "../components/Loading";
 
 const AddPostScreen: FC<{ route: any; navigation: any }> = ({
   route,
@@ -30,6 +31,7 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
   const [photoUri, setPhotoUri] = useState("");
   const [bottomMargin, setBottomMargin] = useState(80);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("")
 
 
   const openCamera = async () => {
@@ -59,6 +61,14 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
   };
 
   const addPost = async () => {
+    if(photoUri == ""){
+      setError("Photo is required")
+      return
+    }
+    if(description.trim() == ""){
+      setError("Description is required")
+      return
+    }
     setLoading(true)
     let res: any
     let url: string = ""
@@ -108,6 +118,10 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
     };
   }, []);
 
+  if(loading){
+    return <Loading/>
+  }
+  
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -172,6 +186,7 @@ const AddPostScreen: FC<{ route: any; navigation: any }> = ({
             multiline={true}
           />
         </LinearGradient>
+        <Text style={{color: 'red'}}>{error}</Text>
       </View>
       
       <View style={{ alignItems: "center", marginBottom: bottomMargin }}>

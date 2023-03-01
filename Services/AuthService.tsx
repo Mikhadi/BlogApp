@@ -32,6 +32,7 @@ const login = async (username: String, password: String): Promise<AuthData> => {
   };
 
   const logout = async (refreshToken: any): Promise<AuthData> => {
+    console.log("Logout refresh token" + refreshToken)
     const res: any = await UserAPI.logoutUser(refreshToken)
     return new Promise((resolve) => {
         setTimeout(() => {
@@ -45,7 +46,15 @@ const login = async (username: String, password: String): Promise<AuthData> => {
         }, 1000);
       });
   };
+
+  const refreshAccessToken = async(refreshToken: any) => {
+    const res: any = await UserAPI.refreshAccessToken(refreshToken)
+    if(res.status == 200){
+      return {access: res.data.accessToken, refresh: res.data.refreshToken}
+    }
+    return {}
+  }
   
   export const authService = {
-    login, logout
+    login, logout, refreshAccessToken
   };

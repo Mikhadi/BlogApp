@@ -9,6 +9,7 @@ type AuthContextData = {
   loading: boolean;
   login(username: String, password: String): Promise<void>;
   signOut(): Promise<void>;
+  refreshTokens(): Promise<void>
 };
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -27,8 +28,17 @@ const AuthProvider: FC<{ children: any }> = ({ children }) => {
       const authDataSerialized = await AsyncStorage.getItem("@AuthData");
       if (authDataSerialized) {
         const _authData: AuthData = JSON.parse(authDataSerialized);
-        _authData.socket = await createSocket(_authData.accessToken)
-        setAuthData(_authData);
+        const tokens = await authService.refreshAccessToken(_authData.refreshToken)
+        if(tokens.access){
+          _authData.accessToken = tokens.access
+          _authData.refreshToken = tokens.refresh
+          _authData.socket = await createSocket(_authData.accessToken)
+          setAuthData(_authData);
+        }
+        else{
+          setAuthData(undefined)
+          await AsyncStorage.removeItem("@AuthData");
+        }
       }
     } catch (error) {
       console.log("Error loading data from memory");
@@ -49,6 +59,7 @@ const AuthProvider: FC<{ children: any }> = ({ children }) => {
   const signOut = async () => {
     setLoading(true);
     const _authData = await authService.logout(authData?.refreshToken);
+    console.log(_authData)
     if (_authData.status == 200) {
       authData?.socket?.close()
       setAuthData(undefined);
@@ -57,8 +68,19 @@ const AuthProvider: FC<{ children: any }> = ({ children }) => {
     setLoading(false);
   };
 
+  const refreshTokens = async () => {
+    const tokens = await authService.refreshAccessToken(authData?.refreshToken)
+    if(tokens.access){
+      let newAuthData: AuthData = authData!
+      newAuthData.accessToken = tokens.access
+      newAuthData.refreshToken = tokens.refresh
+      setAuthData(newAuthData)
+      AsyncStorage.setItem("@AuthData", JSON.stringify(authData))
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ authData, loading, login, signOut }}>
+    <AuthContext.Provider value={{ authData, loading, login, signOut, refreshTokens }}>
       {children}
     </AuthContext.Provider>
   );
