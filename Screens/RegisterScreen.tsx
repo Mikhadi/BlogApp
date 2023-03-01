@@ -29,7 +29,8 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
   const [eyeIcon, setEyeIcon]: any = useState("eye-outline");
   const [modalVisible, setModalVisible] = useState(false);
   const [avatarUri, setAvatarUri] = useState("");
-  const [error, setError] = useState("")
+  const [socialAvatar, setSocialAvatar] = useState("");
+  const [error, setError] = useState("");
 
   const askPermission = async () => {
     try {
@@ -45,6 +46,18 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
   useEffect(() => {
     askPermission();
   }, []);
+
+  useEffect(() => {
+    if (route.params) {
+      const dataJson = route.params.data;
+      setSocialAvatar(dataJson.avatarUri);
+      setEmail(dataJson.email);
+      setName(dataJson.name);
+      if(dataJson.username){
+        setUsername("user" + dataJson.username.slice(0, 6));
+      }
+    }
+  }, [route]);
 
   const openCamera = async () => {
     setModalVisible(false);
@@ -72,29 +85,58 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
     }
   };
 
+  const validateEmail = (emailAdress:String) => {
+    return String(emailAdress)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+
   const register = async () => {
-    let res: any
+    if(!validateEmail(email)){
+      setError("Email is not valid")
+      return
+    }
+    if(name.trim() == ""){
+      setError("Name is required")
+      return
+    }
+    if(username.trim() == ""){
+      setError("Username is required")
+      return
+    }
+    if(password.length < 6){
+      setError("Password must contain at least 6 characters")
+      return
+    }
+    let res: any;
     const user: User = {
       name: name,
       email: email,
       username: username,
       password: password,
-      avatar: "url"
-    }
-    try{
-      if (user.avatar != ""){
-        const url = await UserModel.uploadImage(avatarUri)
-        user.avatar = url
+      avatar: "",
+    };
+    try {
+      if (user.avatar != "") {
+        const url = await UserModel.uploadImage(avatarUri);
+        user.avatar = url;
+      }else if(socialAvatar != "" && socialAvatar != undefined){
+        user.avatar = socialAvatar
       }
-      res = await UserModel.register(user)
-    }catch(err){
-      console.log("Failed register user")
+      res = await UserModel.register(user);
+    } catch (err) {
+      console.log("Failed register user");
     }
-    if (res.status == 200){
-      ToastAndroid.show("Registered succesfully, Now you can login", ToastAndroid.LONG)
-      navigation.goBack()
-    }else{
-      setError(res.data.error)
+    if (res.status == 200) {
+      ToastAndroid.show(
+        "Registered succesfully, Now you can login",
+        ToastAndroid.LONG
+      );
+      navigation.goBack();
+    } else {
+      setError(res.data.error);
     }
   };
 
@@ -109,16 +151,16 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
   return (
     <View style={styles.container}>
       <Modal
-          isVisible={modalVisible}
-          backdropOpacity={0}
-          onBackdropPress={() => {
-            setModalVisible(false);
-          }}
-          style={{
-            justifyContent: 'center',
-            alignItems:'center',
-          }}
-        >
+        isVisible={modalVisible}
+        backdropOpacity={0}
+        onBackdropPress={() => {
+          setModalVisible(false);
+        }}
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <View style={styles.modalView}>
           <TouchableOpacity
             style={{ alignItems: "center" }}
@@ -163,12 +205,19 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
               onPress={() => setModalVisible(true)}
               style={styles.addImageButton}
             >
-              {avatarUri == "" ? (
+              {avatarUri == "" && socialAvatar == "" && (
                 <Image
                   source={require("../assets/add_photo.png")}
                   style={styles.addImageButton}
                 />
-              ) : (
+              )}
+              {socialAvatar != "" && avatarUri == "" && (
+                <Image
+                  source={{ uri: socialAvatar }}
+                  style={styles.addImageButton}
+                />
+              )}
+              {avatarUri != "" && (
                 <Image
                   source={{ uri: avatarUri }}
                   style={styles.addImageButton}
@@ -250,7 +299,7 @@ const RegisterScreen: FC<{ route: any; navigation: any }> = ({
               <Ionicons name={eyeIcon} size={25} color={MyColors.text} />
             </TouchableOpacity>
           </LinearGradient>
-          <Text style={{color: 'red'}}>{error}</Text>
+          <Text style={{ color: "red" }}>{error}</Text>
         </View>
       </KeyboardAwareScrollView>
       <View style={{ alignItems: "center", marginBottom: 20 }}>

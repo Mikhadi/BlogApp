@@ -1,17 +1,20 @@
-import { Dispatch, FC, SetStateAction, useState } from "react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import MyColors from "../themes/myTheme";
-import UserModel from "../Model/UserModel";
 import { useAuth } from "../Contexts/AuthContext";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import * as Facebook from "expo-auth-session/providers/facebook"
+
+WebBrowser.maybeCompleteAuthSession();
 
 const facebookPressed = () => {
   alert("Facebook presed");
@@ -25,6 +28,79 @@ const WelcomeScreen: FC<{ route: any; navigation: any}> = ({
   route,
   navigation,
 }) => {
+  const [googleToken, setGoogleToken] = useState("");
+  const [facebookToken, setFacebookToken] = useState("");
+
+  const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
+    expoClientId: "535293620813-33mfc16puosd2rkepvu1v3uj62vp2uka.apps.googleusercontent.com"
+  });
+
+  const [facebookRequest, facebookResponse, facebookPromptAsync] = Facebook.useAuthRequest({
+    expoClientId: "774051237237954"
+  });
+
+  useEffect(() => {
+    if (googleResponse?.type === "success") {
+      setGoogleToken(googleResponse.authentication!.accessToken);
+      getUserInfo();
+    }
+  }, [googleResponse, googleToken]);
+
+  useEffect(() => {
+    if (facebookResponse && facebookResponse.type === "success" && facebookResponse.authentication) {
+      (async () => {
+        const userInfoResponse = await fetch(
+          `https://graph.facebook.com/me?access_token=${facebookResponse.authentication!.accessToken}&fields=id,name,picture.type(large),email`
+        );
+        userInfoResponse.json().then((userInfo)=>{
+          const userData = {
+            username: userInfo.id,
+            email: userInfo.email,
+            avatarUri: userInfo.picture.data.url,
+            name: userInfo.name
+          }
+          navigation.navigate('Register', { data: userData})
+        })
+      })();
+    }
+  }, [facebookResponse]);
+
+  const handleFacebookPressAsync = async () => {
+    const result = await facebookPromptAsync();
+    if (result.type !== "success") {
+      console.log("Facebook login error")
+      return;
+    }
+  };
+
+  const getUserInfo = async () => {
+    try {
+      const response = await fetch(
+        "https://www.googleapis.com/userinfo/v2/me",
+        {
+          headers: { Authorization: `Bearer ${googleToken}` },
+        }
+      );
+
+      //const userInfo = await 
+      response.json().then((userInfo) => {
+        const userData = {
+          username: userInfo.id,
+          email: userInfo.email,
+          avatarUri: userInfo.picture,
+          name: userInfo.name
+        }
+        navigation.navigate('Register', { data: userData})
+      })
+    } catch (error) {
+      console.log("Error - "+ error)
+    }
+  };
+
+  useEffect(()=>{
+    console.log("WElcome screen created")
+  }, [])
+
 
   const auth = useAuth();
   const [username, setUsername] = useState("");
@@ -130,7 +206,7 @@ const WelcomeScreen: FC<{ route: any; navigation: any}> = ({
               padding: 10,
               borderRadius: 8,
             }}
-            onPress={facebookPressed}
+            onPress={handleFacebookPressAsync}
           >
             <Ionicons name="logo-facebook" size={40} color={MyColors.text} />
           </TouchableOpacity>
@@ -143,7 +219,9 @@ const WelcomeScreen: FC<{ route: any; navigation: any}> = ({
               padding: 10,
               borderRadius: 8,
             }}
-            onPress={googlePressed}
+            onPress={()=>{
+              googlePromptAsync()
+            }}
           >
             <Ionicons name="logo-google" size={40} color={MyColors.text} />
           </TouchableOpacity>

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "BlogApp",
-    "slug": "BlogApp",
+    "slug": "blogapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -33,8 +33,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "a42ebebf-366c-4a41-a9f6-8fbb9cc02d29"
+        "projectId": "d6ff912d-0e4b-4bcd-bf76-b3d73399b826"
       }
-    }
+    },
+    "owner": "dyachkov_mihail"
   }
 }

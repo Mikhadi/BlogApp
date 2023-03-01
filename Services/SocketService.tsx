@@ -17,5 +17,4 @@ const clientSocketConnect = (clientSocket: any): Promise<string> => {
   });
 };
 
-
 export default createSocket

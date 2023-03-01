@@ -66,14 +66,12 @@ const ChatScreen: FC<{ route: any; navigation: any }> = ({
   };
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", async () => {
-      socket?.emit("chat:get_messages", { to: "Global" });
-    });
-    return unsubscribe;
-  }, [navigation]);
+    socket?.emit("chat:get_messages", { to: "Global" });
+  }, []);
 
   useEffect(() => {
     socket?.on("chat:get_messages.response", (arr) => {
+      console.log("====> Get all messages from socket")
       let messages: Message[] = [];
       arr.forEach((elem: any) => {
         const msg: Message = {

@@ -1,6 +1,5 @@
 import { createContext, useState, useContext, useEffect, FC } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Client, { Socket } from "socket.io-client";
 
 import { AuthData, authService } from "../Services/AuthService";
 import createSocket from "../Services/SocketService";

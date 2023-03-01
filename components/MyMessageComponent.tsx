@@ -9,13 +9,14 @@ export const MyMessageItem: FC<{ id: String; text: String; time: Date }> = ({
 }) => {
   function getHoursAndMinutes(date: Date) {
     return (
-      padTo2Digits(date.getHours()) + ":" + padTo2Digits(date.getMinutes())
+      date.getHours() + ":" + padTo2Digits(date.getMinutes())
     );
   }
 
   function padTo2Digits(num: Number) {
     return String(num).padStart(2, "0");
   }
+
   return (
     <View style={styles.container}>
       <View style={styles.messageBox}>
